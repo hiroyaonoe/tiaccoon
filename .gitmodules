@@ -1,0 +1,7 @@
+[submodule "rdma-core"]
+	path = rdma-core
+	url = git@github.com:hiroyaonoe/rdma-core.git
+	branch = tiaccoon
+[submodule "netperf"]
+	path = netperf
+	url = git@github.com:hiroyaonoe/netperf.git

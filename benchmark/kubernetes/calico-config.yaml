@@ -1,0 +1,51 @@
+# This section includes base Calico installation configuration.
+# For more information, see: https://docs.tigera.io/calico/latest/reference/installation/api#operator.tigera.io/v1.Installation
+apiVersion: operator.tigera.io/v1
+kind: Installation
+metadata:
+  name: default
+spec:
+  # Configures Calico networking.
+  calicoNetwork:
+    ipPools:
+    - name: default-ipv4-ippool
+      blockSize: 26
+      cidr: 10.10.0.0/16
+      encapsulation: VXLANCrossSubnet
+      natOutgoing: Enabled
+      nodeSelector: all()
+    nodeAddressAutodetectionV4:
+      # KubernetesのNode Internal IPと同じIPを使う(zh同士で直接繋いでいるIP)
+      # https://docs.tigera.io/calico/latest/networking/ipam/ip-autodetection
+      kubernetes: NodeInternalIP
+---
+# This section configures the Calico API server.
+# For more information, see: https://docs.tigera.io/calico/latest/reference/installation/api#operator.tigera.io/v1.APIServer
+apiVersion: operator.tigera.io/v1
+kind: APIServer
+metadata:
+  name: default
+spec: {}
+---
+# https://docs.tigera.io/calico/latest/reference/resources/bgpconfig
+apiVersion: projectcalico.org/v3
+kind: BGPConfiguration
+metadata:
+  name: default
+spec:
+  listenPort: 178 # https://github.com/projectcalico/calico/issues/7893
+  logSeverityScreen: Info
+  nodeToNodeMeshEnabled: true
+  nodeMeshMaxRestartTime: 120s
+  asNumber: 65535
+  serviceClusterIPs:
+    - cidr: 10.96.0.0/12
+  bindMode: None
+  communities:
+    - name: bgp-large-community
+      value: 65535:300:100
+  prefixAdvertisements:
+    - cidr: 10.10.0.0/16
+      communities:
+        - bgp-large-community
+        - 65535:120

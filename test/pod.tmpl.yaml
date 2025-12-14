@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: $(NAME)
+  namespace: tiaccoon-test
+  labels:
+    app: $(NAME)
+spec:
+  terminationGracePeriodSeconds: 0
+  nodeName: $(NODE)
+  containers:
+  - image: tiaccoon-$(APP):latest
+    name: tiaccoon-$(APP)
+    imagePullPolicy: Never
+    command: ["/bin/bash", "-c", "echo 'ulimit -l unlimited' >> /root/.bashrc && echo 'ulimit -s unlimited' >> /root/.bashrc && sleep infinity"]
+    securityContext:
+      capabilities:
+        add: ["SYS_RESOURCE"] # for ulimit
+    ports:
+    - containerPort: 12865
+    - containerPort: 22865
+    - containerPort: 80
+    volumeMounts:
+    - name: repo
+      mountPath: /home/onoe/src/github.com/hiroyaonoe
+    - name: tmp-tiaccoon
+      mountPath: /tmp/tiaccoon
+    resources:
+      limits:
+        smarter-devices/infiniband: 1
+      requests:
+        smarter-devices/infiniband: 1
+  volumes:
+  - name: repo
+    hostPath:
+      path: /home/onoe/src/github.com/hiroyaonoe
+      type: Directory
+  - name: tmp-tiaccoon
+    hostPath:
+      path: /tmp/tiaccoon
+      type: Directory
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: $(NAME)
+#   namespace: tiaccoon-test
+# spec:
+#   selector:
+#     app: $(NAME)
+#   ports:
+#   - name: one
+#     protocol: TCP
+#     port: 12865
+#     targetPort: 12865
+#   - name: two
+#     protocol: TCP
+#     port: 22865
+#     targetPort: 22865

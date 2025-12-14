@@ -1,0 +1,42 @@
+FROM ubuntu:22.04
+
+RUN apt-get update
+RUN apt-get install -y \
+	git \
+	build-essential \
+	autoconf \
+	texinfo
+
+RUN git clone https://github.com/hiroyaonoe/netperf.git /netperf
+WORKDIR /netperf
+RUN ./autogen.sh
+RUN ./configure --enable-unixdomain=yes --enable-cpuutil=procstat
+RUN make CFLAGS=-fcommon
+RUN make install
+
+RUN apt-get install -y \
+	linux-modules-extra-$(uname -r) \
+	rdma-core \
+	libibverbs1 \
+	libibverbs-dev \
+	librdmacm1 \
+	librdmacm-dev \
+	rdmacm-utils \
+	ibverbs-utils
+
+RUN apt-get install -y \
+	bash \
+	curl \
+	strace \
+	gcc \
+	make \
+	netcat \
+	lsof \
+	iproute2 \
+	htop \
+	traceroute \
+	python3
+
+WORKDIR /
+
+CMD ["/bin/sh" "-c" "sleep infinity"]
