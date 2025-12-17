@@ -1,5 +1,5 @@
-# tiaccoon
-Tiaccoon achieve unified access control and container communication without dependence on specific transports by replacing the process of socket API.
+# Tiaccoon [Transport-Independent Access Control in COntainer (Overlay) Networks]
+Tiaccoon achieves unified access control and container communication without dependence on specific transports by replacing the process of socket API.
 
 ## Implementation Roadmap
 - [x] System call hooking
